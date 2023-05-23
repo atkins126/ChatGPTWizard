@@ -20,7 +20,7 @@ uses
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.UI.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool,
   FireDAC.Phys, FireDAC.Stan.ExprFuncs, FireDAC.Phys.SQLite, FireDAC.Comp.Client,
   FireDAC.Comp.DataSet, FireDAC.VCLUI.Wait, FireDAC.Comp.UI, UConsts,
-  Vcl.WinXCtrls
+  Vcl.WinXCtrls, System.ImageList, Vcl.ImgList, ShellApi
   {$IF CompilerVersion >= 32.0}, UWriteSonicThread, UYouChatThread{$ENDIF};
 
 type
@@ -86,6 +86,13 @@ type
     mmoYouChatAnswer: TMemo;
     ActivityIndicator1: TActivityIndicator;
     GetQuestion: TMenuItem;
+    pmClear: TPopupMenu;
+    ClearQuestion1: TMenuItem;
+    ClearAnswer1: TMenuItem;
+    Clearallhistoryitems1: TMenuItem;
+    N1: TMenuItem;
+    btnHelp: TSpeedButton;
+    ImageList1: TImageList;
     procedure Btn_AskClick(Sender: TObject);
     procedure Btn_ClipboardClick(Sender: TObject);
     procedure CopytoClipboard1Click(Sender: TObject);
@@ -126,6 +133,11 @@ type
     procedure pgcMainChanging(Sender: TObject; var AllowChange: Boolean);
     procedure pgcAnswersChange(Sender: TObject);
     procedure GetQuestionClick(Sender: TObject);
+    procedure ClearQuestion1Click(Sender: TObject);
+    procedure ClearAnswer1Click(Sender: TObject);
+    procedure HistoryDBGridDblClick(Sender: TObject);
+    procedure Clearallhistoryitems1Click(Sender: TObject);
+    procedure btnHelpClick(Sender: TObject);
   private
     FChatGPTTrd: TExecutorTrd;
     {$IF CompilerVersion >= 32.0}
@@ -149,6 +161,7 @@ type
     procedure HighlightCellTextFuzzy(AGrid: TDbGrid; const ARect: TRect; AField: TField; AMatchedIndexes : TList; AState: TGridDrawState ;
                                 ACaseSensitive: Boolean; ABkColor: TColor; ASelectedBkColor: TColor);
     procedure EnableUI(ATaskName: string);
+    procedure ClearAnswers;
   public
     procedure InitialFrame;
     procedure InitialClassViewMenueItems(AClassList: TClassList);
@@ -190,6 +203,14 @@ begin
       TSingletonSettingObj.Instance.ShouldReloadHistory := True;
     end;
   end;
+end;
+
+procedure TFram_Question.btnHelpClick(Sender: TObject);
+var
+  LvUrl: string;
+begin
+  LvUrl := 'https://github.com/AliDehbansiahkarbon/ChatGPTWizard';
+  ShellExecute(0, nil, PChar(LvUrl), nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TFram_Question.Btn_AskClick(Sender: TObject);
@@ -381,9 +402,42 @@ begin
   end;
 end;
 
+procedure TFram_Question.Clearallhistoryitems1Click(Sender: TObject);
+begin
+  if FDQryHistory.IsEmpty then
+    Exit;
+
+  if MessageDlg('Are you sure you want to clear all history items?', TMsgDlgType.mtWarning, [mbYes, mbNo], 0, mbNo) = mrYes then
+  begin
+    FDConnection.ExecSQL('Delete from TbHistory');
+    FDQryHistory.Close;
+    FDQryHistory.Open;
+    mmoHistoryDetail.Clear;
+    FCellCloseBtn.Parent := Self;
+  end;
+end;
+
+procedure TFram_Question.ClearAnswer1Click(Sender: TObject);
+begin
+  ClearAnswers;
+end;
+
+procedure TFram_Question.ClearAnswers;
+begin
+  mmoAnswer.Lines.Clear;
+  mmoWriteSonicAnswer.Lines.Clear;
+  mmoYouChatAnswer.Lines.Clear;
+end;
+
+procedure TFram_Question.ClearQuestion1Click(Sender: TObject);
+begin
+  mmoQuestion.Clear;
+end;
+
 procedure TFram_Question.CloseBtnClick(Sender: TObject);
 begin
-  FDQryHistory.Delete;
+  if FDQryHistory.RecordCount > 0 then
+    FDQryHistory.Delete;
 end;
 
 procedure TFram_Question.CopyToClipBoard;
@@ -434,7 +488,7 @@ Var
   LvMatchedIndexes: TList;
 begin
   //================= Drawing delete button ============================
-  if (not FDQryHistoryHID.IsNull) and (Column.Title.Caption = '^_^') Then
+  if (not FDQryHistory.IsEmpty) and (not FDQryHistoryHID.IsNull) and (Column.Title.Caption = '^_^') Then
   begin
     DataRect := FHistoryGrid.CellRect(Column.Index + 1, FHistoryGrid.Row);
     If FCellCloseBtn.Parent <> FHistoryGrid Then
@@ -720,6 +774,16 @@ begin
   end;
 end;
 
+procedure TFram_Question.HistoryDBGridDblClick(Sender: TObject);
+begin
+  if (FDQryHistory.Active) and (FDQryHistory.RecordCount > 0) then
+  begin
+    mmoQuestion.Lines.Clear;
+    mmoQuestion.Lines.Add(FDQryHistory.FieldByName('Question').AsString);
+    pgcMain.ActivePageIndex := 0;
+  end;
+end;
+
 procedure TFram_Question.InitialClassViewMenueItems(AClassList: TClassList);
 var
   LvKey: Integer;
@@ -755,24 +819,24 @@ begin
     AddMenuItem(TSingletonSettingObj.Instance.PredefinedQuestions.Items[LvKey].Caption);
 
   // Add Convert commands
-    LvMenuItem := TMenuItem.Create(Self);
-    LvMenuItem.Caption := 'Convert to';
-    pmClassOperations.Items.Add(LvMenuItem);
+  LvMenuItem := TMenuItem.Create(Self);
+  LvMenuItem.Caption := 'Convert to';
+  pmClassOperations.Items.Add(LvMenuItem);
 
-    AddSubMenu('C#', LvMenuItem, CSharpClick);
-    AddSubMenu('Java', LvMenuItem, JavaClick);
-    AddSubMenu('Python', LvMenuItem, PythonClick);
-    AddSubMenu('Javascript', LvMenuItem, JavascriptClick);
-    AddSubMenu('C', LvMenuItem, CClick);
-    AddSubMenu('C++', LvMenuItem, CPlusPlusClick);
-    AddSubMenu('Go', LvMenuItem, GoClick);
-    AddSubMenu('Rust', LvMenuItem, RustClick);
+  AddSubMenu('C#', LvMenuItem, CSharpClick);
+  AddSubMenu('Java', LvMenuItem, JavaClick);
+  AddSubMenu('Python', LvMenuItem, PythonClick);
+  AddSubMenu('Javascript', LvMenuItem, JavascriptClick);
+  AddSubMenu('C', LvMenuItem, CClick);
+  AddSubMenu('C++', LvMenuItem, CPlusPlusClick);
+  AddSubMenu('Go', LvMenuItem, GoClick);
+  AddSubMenu('Rust', LvMenuItem, RustClick);
 
   // Add Custom Commands
-    LvMenuItem := TMenuItem.Create(Self);
-    LvMenuItem.Caption := 'Custom Command';
-    LvMenuItem.OnClick := CustomCommandClick;
-    pmClassOperations.Items.Add(LvMenuItem);
+  LvMenuItem := TMenuItem.Create(Self);
+  LvMenuItem.Caption := 'Custom Command';
+  LvMenuItem.OnClick := CustomCommandClick;
+  pmClassOperations.Items.Add(LvMenuItem);
 end;
 
 procedure TFram_Question.InitialFrame;
@@ -794,6 +858,7 @@ begin
     Parent := pnlHistoryTop;
     Align := alClient;
     DataSource := DSHistory;
+    OnDblClick := HistoryDBGridDblClick;
     Options := [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack];
 
     with Columns.Add do
