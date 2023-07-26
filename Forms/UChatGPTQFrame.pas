@@ -1,10 +1,11 @@
-﻿{****************************************************}
-{                                                    }
-{    This unit contains a frame that will be         }
-{    used in dockable form.                          }
-{    Auhtor: Ali Dehbansiahkarbon(adehban@gmail.com) }
-{                                                    }
-{****************************************************}
+﻿{***************************************************}
+{                                                   }
+{   This unit contains a frame that will be         }
+{   used in dockable form.                          }
+{   Auhtor: Ali Dehbansiahkarbon(adehban@gmail.com) }
+{   GitHub: https://github.com/AliDehbansiahkarbon  }
+{                                                   }
+{***************************************************}
 unit UChatGPTQFrame;
 
 interface
@@ -92,7 +93,6 @@ type
     Clearallhistoryitems1: TMenuItem;
     N1: TMenuItem;
     btnHelp: TSpeedButton;
-    ImageList1: TImageList;
     procedure Btn_AskClick(Sender: TObject);
     procedure Btn_ClipboardClick(Sender: TObject);
     procedure CopytoClipboard1Click(Sender: TObject);

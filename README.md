@@ -32,15 +32,15 @@
 - Dockable question form.
 - Inline questions(in the editor).
 - Context menu options to help you to find bugs, write tests, optimize code, add comments, etc...
-- Class view.
+- Class view(Code conversion, code optimizing, test units, and other options per class).
 - Predefined Questions for class view.
 - History to save your tokens on OpenAI !
 - Fuzzy string match searches in the history.
 - Animated letters(Like the website).
 - AI Code Translator
 - Proxy server options. 
-- Supports Writesonic AI as the second AI service.
-- Supports YouChat AI as the third AI service.
+- Supports [Writesonic](https://writesonic.com/chat) AI as the second AI service.
+- Supports [YouChat](https://you.com/code) AI as the third AI service.
 
 
 
@@ -92,8 +92,12 @@ This Plugin Supports the following AI Services:
 
 
 ## How to Install
+1- [Getit package manager](https://getitnow.embarcadero.com/chatgptwizard/)
 
-Open the project, right-click on the project in the project manager, build, and install.
+2- [Delphinus package manager](https://github.com/Memnarch/Delphinus/wiki/Installing-Delphinus) - you can install Delphinus package manager and install ChatGPTWizard there. (Delphinus-Support)
+
+3- Direct installation - Open the project in Delphi, right-click on the project node in the project manager, build, and install.
+
 
 <br />
 
@@ -177,16 +181,17 @@ Context Menu for Selected text or a block of code. The Result will be inserted a
 **Options**
 
 - Ask
-- Add Test  - Will try to create unit test for the selected text
-- Find Bugs - Find fugs in the selected text
-- Optimize - Will Optimize the selected text
-- Add Comments - Will add necessary comments to the selected code
-- Complete code - Will try to add any missing code to the selected code
+- Add Test  - Will try to create unit test for the selected text.
+- Find Bugs - Find fugs in the selected text.
+- Optimize - Will Optimize the selected text.
+- Add Comments - Will add necessary comments to the selected code.
+- Complete code - Will try to add any missing code to the selected code.
+- Explain code - will explain that what does the selected code in Delphi.
 
 <br />
 <br />
 
-![image_2023-04-25_15-59-25](https://user-images.githubusercontent.com/24512608/236583960-d584de08-6924-4b42-9e0a-c028a36d919f.png)
+![image](https://github.com/AliDehbansiahkarbon/ChatGPTWizard/assets/5601608/51bf3bd9-ab79-4a3c-be18-9e3f7b0cdc06)
 
 <br />
 
